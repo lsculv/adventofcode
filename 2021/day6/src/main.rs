@@ -10,7 +10,6 @@ fn parse_input(input: &str) -> [u64; 9] {
 }
 
 fn part_1(fish: &mut [u64; 9]) -> u64 {
-    println!("{:?}", fish);
     for _ in 0..80 {
         let born_fish = fish[0];
         fish.rotate_left(1);
