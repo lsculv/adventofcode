@@ -23,52 +23,26 @@ fn part_1(input: &str) -> u32 {
 }
 
 fn part_2(input: &str) -> u32 {
-    const LINE_LENGTH: usize = 12;
-    let mut columns: [(u32, u32); 12] = [(0, 0); 12];
-    for (i, c) in input.chars().filter(|c| c != &'\n').enumerate() {
-        match c {
-            '0' => columns[i % LINE_LENGTH].0 += 1,
-            '1' => columns[i % LINE_LENGTH].1 += 1,
-            _ => (),
-        }
-    }
-    let mut lines: Vec<&str> = input.lines().collect();
-    let mut column = 0;
-    let mut max: char;
-    while lines.len() > 1 {
-        println!("{:?}", lines.len());
-        for (i, line) in lines.clone().iter().enumerate() {
-            if columns[column].0 > columns[column].1 {
-                max = '0'
-            } else {
-                max = '1'
-            }
+    fn find_line(mut lines: Vec<&str>, most_common: bool) -> u32 {
+        let mut i = 0;
 
-            if line.chars().nth(column).unwrap() != max {
-                lines.remove(i);
-            }
-        }
-        column += 1;
-    }
-    let oxygen_rating: u32 = lines.pop().unwrap().parse().unwrap();
-    let mut lines: Vec<&str> = input.lines().collect();
-    column = 0;
-    while lines.len() > 1 {
-        println!("{:?}", lines.len());
-        for (i, line) in lines.clone().iter().enumerate() {
-            if columns[column].0 < columns[column].1 {
-                max = '1'
+        while lines.len() > 1 {
+            let (ones, zeros): (Vec<&str>, Vec<&str>) =
+                lines.iter().partition(|s| s.chars().nth(i).unwrap() == '1');
+            if (ones.len() >= zeros.len()) == most_common {
+                lines = ones;
             } else {
-                max = '0'
+                lines = zeros;
             }
-
-            if line.chars().nth(column).unwrap() == max {
-                lines.remove(i);
-            }
+            i += 1
         }
-        column += 1;
+        u32::from_str_radix(lines.pop().unwrap(), 2).unwrap()
     }
-    let co2_rating: u32 = lines.pop().unwrap().parse().unwrap();
+
+    let lines: Vec<&str> = input.lines().collect();
+    let oxygen_rating = find_line(lines.clone(), true);
+    let co2_rating = find_line(lines.clone(), false);
+
     oxygen_rating * co2_rating
 }
 
