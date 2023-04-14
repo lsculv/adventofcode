@@ -4,8 +4,8 @@ fn parse_input(input: &str) -> [u64; 9] {
     let mut collection: [u64; 9] = [0; 9];
     input
         .split(',')
-        .map(|c| c.parse::<u64>().unwrap())
-        .for_each(|num| collection[num as usize] += 1);
+        .map(|c| c.parse().unwrap())
+        .for_each(|num| collection[num] += 1);
     collection
 }
 
