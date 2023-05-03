@@ -79,8 +79,6 @@ func main() {
 	input := string(bytes)
 	input = strings.TrimSuffix(input, "\n")
 
-    fmt.Printf("%v\n", 70 * 240 * 68 * 67 * 37)
-
 	fmt.Printf("Part 1: %v\n", part_1(input))
 	fmt.Printf("Part 2: %v\n", part_2(input))
 }
