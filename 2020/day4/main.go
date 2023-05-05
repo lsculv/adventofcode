@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"regexp"
 	"strconv"
 	"strings"
-    "regexp"
 )
 
 func part_1(input string) int {
@@ -76,40 +76,40 @@ func part_2(input string) int {
 					fields |= 1 << 2
 				}
 			case "hgt":
-                unit := code[len(code)-2:]
-                height, err := strconv.Atoi(code[4:len(code)-2])
-                if err != nil {
-                    break
-                }
-                if (unit == "cm" && height >= 150 && height <= 193) || (unit == "in" && height >= 59 && height <= 76) {
-				    fields |= 1 << 3
-                }
+				unit := code[len(code)-2:]
+				height, err := strconv.Atoi(code[4 : len(code)-2])
+				if err != nil {
+					break
+				}
+				if (unit == "cm" && height >= 150 && height <= 193) || (unit == "in" && height >= 59 && height <= 76) {
+					fields |= 1 << 3
+				}
 			case "hcl":
-                match, err := regexp.MatchString("^#[0-9a-f]{6}", code[4:])
-                if err != nil {
-                    panic(err)
-                }
-                if match {
-				    fields |= 1 << 4
-                }
+				match, err := regexp.MatchString("^#[0-9a-f]{6}", code[4:])
+				if err != nil {
+					panic(err)
+				}
+				if match {
+					fields |= 1 << 4
+				}
 			case "ecl":
-                if code[4:] == "amb" ||
-                code[4:] == "blu" ||
-                code[4:] == "brn" ||
-                code[4:] == "gry" ||
-                code[4:] == "grn" ||
-                code[4:] == "hzl" ||
-                code[4:] == "oth" {
-				    fields |= 1 << 5
-                }
+				if code[4:] == "amb" ||
+					code[4:] == "blu" ||
+					code[4:] == "brn" ||
+					code[4:] == "gry" ||
+					code[4:] == "grn" ||
+					code[4:] == "hzl" ||
+					code[4:] == "oth" {
+					fields |= 1 << 5
+				}
 			case "pid":
-                match, err := regexp.MatchString("^[0-9]{9}$", code[4:])
-                if err != nil {
-                    panic(err)
-                }
-                if match {
-				fields |= 1 << 6
-                }
+				match, err := regexp.MatchString("^[0-9]{9}$", code[4:])
+				if err != nil {
+					panic(err)
+				}
+				if match {
+					fields |= 1 << 6
+				}
 			}
 		}
 		if fields == 0b01111111 {
@@ -117,7 +117,7 @@ func part_2(input string) int {
 		}
 	}
 
-	return valid_passports 
+	return valid_passports
 }
 
 func main() {
