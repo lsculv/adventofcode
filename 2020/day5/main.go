@@ -61,8 +61,6 @@ func part2(seatIDs []int) int {
 		containedIDs[id] = true
 	}
 
-	fmt.Println(containedIDs)
-
 	for id := range seatIDs {
 		if containedIDs[id] && containedIDs[id+2] && !containedIDs[id+1] {
 			return id + 1
