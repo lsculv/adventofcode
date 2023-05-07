@@ -55,7 +55,7 @@ func part1(seatIDs []int) int {
 }
 
 func part2(seatIDs []int) int {
-	var containedIDs [919 + 3]bool
+	var containedIDs [127 * 8 + 7]bool
 
 	for _, id := range seatIDs {
 		containedIDs[id] = true
