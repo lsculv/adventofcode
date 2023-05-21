@@ -28,7 +28,7 @@ let part_2 input =
   sum (map (String.split_lines input) total_fuel_from_mass)
 ;;
 
-let input = In_channel.read_all "day1.txt"
+let input = In_channel.read_all "../inputs/day1.txt"
 
 let () =
   printf "Part 1: %d\n" (part_1 input);
