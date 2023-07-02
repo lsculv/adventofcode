@@ -19,9 +19,7 @@ let part_1 input =
 let part_2 input =
   let rec total_fuel n =
     let x = (n / 3) - 2 in
-    match x > 0 with
-    | false -> 0
-    | true -> x + total_fuel x
+    if x > 0 then x + total_fuel x else 0
   in
   let total_fuel_from_mass fuel = total_fuel (int_of_string fuel) in
   input |> String.split_lines |> map total_fuel_from_mass |> sum
