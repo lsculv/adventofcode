@@ -47,15 +47,15 @@ fn find_digit_right(line: &[u8]) -> u32 {
                     b'i' if line[i - 3] == b'n' => return 9,
                     _ => continue,
                 },
-                b'v' if checkr(line, i - 2, &[b'f', b'i']) => return 5,
-                b'e' if checkr(line, i - 2, &[b't', b'h', b'r']) => return 3,
+                b'v' if checkr(line, i - 2, b"fi") => return 5,
+                b'e' if checkr(line, i - 2, b"thr") => return 3,
                 _ => continue,
             },
-            b'o' if checkr(line, i - 1, &[b't', b'w']) => return 2,
-            b'r' if checkr(line, i - 1, &[b'f', b'o', b'u']) => return 4,
-            b'x' if checkr(line, i - 1, &[b's', b'i']) => return 6,
-            b'n' if checkr(line, i - 1, &[b's', b'e', b'v', b'e']) => return 7,
-            b't' if checkr(line, i - 1, &[b'e', b'i', b'g', b'h']) => return 8,
+            b'o' if checkr(line, i - 1, b"tw") => return 2,
+            b'r' if checkr(line, i - 1, b"fou") => return 4,
+            b'x' if checkr(line, i - 1, b"si") => return 6,
+            b'n' if checkr(line, i - 1, b"seve") => return 7,
+            b't' if checkr(line, i - 1, b"eigh") => return 8,
             _ => continue,
         }
     }
@@ -68,24 +68,24 @@ fn find_digit_left(line: &[u8]) -> u32 {
             return (line[i] - b'0') as u32;
         }
         match line[i] {
-            b'o' if checkl(line, i + 1, &[b'n', b'e']) => return 1,
+            b'o' if checkl(line, i + 1, b"ne") => return 1,
             b't' => match line[i + 1] {
                 b'w' if line[i + 2] == b'o' => return 2,
-                b'h' if checkl(line, i + 2, &[b'r', b'e', b'e']) => return 3,
+                b'h' if checkl(line, i + 2, b"ree") => return 3,
                 _ => continue,
             },
             b'f' => match line[i + 1] {
-                b'o' if checkl(line, i + 2, &[b'u', b'r']) => return 4,
-                b'i' if checkl(line, i + 2, &[b'v', b'e']) => return 5,
+                b'o' if checkl(line, i + 2, b"ur") => return 4,
+                b'i' if checkl(line, i + 2, b"ve") => return 5,
                 _ => continue,
             },
             b's' => match line[i + 1] {
                 b'i' if line[i + 2] == b'x' => return 6,
-                b'e' if checkl(line, i + 2, &[b'v', b'e', b'n']) => return 7,
+                b'e' if checkl(line, i + 2, b"ven") => return 7,
                 _ => continue,
             },
-            b'e' if checkl(line, i + 1, &[b'i', b'g', b'h', b't']) => return 8,
-            b'n' if checkl(line, i + 1, &[b'i', b'n', b'e']) => return 9,
+            b'e' if checkl(line, i + 1, b"ight") => return 8,
+            b'n' if checkl(line, i + 1, b"ine") => return 9,
             _ => continue,
         }
     }
