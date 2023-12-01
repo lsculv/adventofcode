@@ -115,12 +115,12 @@ mod test {
     use super::*;
     #[test]
     fn test_part_1() {
-        let input: &[u8] = b"1abc2\npqr3stu8vwx\na1b2c3d4e5f\ntreb7uchet\n";
+        let input: &[u8] = b"1abc2\npqr3stu8vwx\na1b2c3d4e5f\ntreb7uchet";
         assert_eq!(part_1(input), 142);
     }
     #[test]
     fn test_part_2() {
-        let input: &[u8] = b"two1nine\neightwothree\nabcone2threexyz\nxtwone3four\n4nineeightseven2\nzoneight234\n7pqrstsixteen\n";
-        assert_eq!(part_2(input), 142);
+        let input: &[u8] = b"two1nine\neightwothree\nabcone2threexyz\nxtwone3four\n4nineeightseven2\nzoneight234\n7pqrstsixteen";
+        assert_eq!(part_2(input), 281);
     }
 }
