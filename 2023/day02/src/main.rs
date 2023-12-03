@@ -11,7 +11,7 @@ fn part_1(input: &str) -> usize {
         let line = line.split_once(':').unwrap().1;
         'outer: for cubes in line.split([',', ';']) {
             let (count, color) = cubes.trim_start().split_once(' ').unwrap();
-            let count = usize::from_str_radix(count, 10).unwrap();
+            let count = count.parse::<usize>().unwrap();
             match color {
                 "red" => {
                     if count > 12 {
@@ -52,7 +52,7 @@ fn part_2(input: &str) -> usize {
         let line = line.split_once(':').unwrap().1;
         for cubes in line.split([',', ';']) {
             let (count, color) = cubes.trim_start().split_once(' ').unwrap();
-            let count = usize::from_str_radix(count, 10).unwrap();
+            let count = count.parse::<usize>().unwrap();
             match color {
                 "red" => reds.push(count),
                 "green" => greens.push(count),
