@@ -1,5 +1,6 @@
 #![feature(slice_split_once)]
 #![feature(byte_slice_trim_ascii)]
+#![feature(iter_collect_into)]
 
 use std::collections::HashSet;
 
@@ -37,23 +38,26 @@ fn part_2(input: &[u8]) -> usize {
 
 fn count_matches(cards: &[u8]) -> Vec<usize> {
     let mut matches = Vec::with_capacity(cards.split(|&b| b == b'\n').count() + 1);
+    let mut winners = HashSet::with_capacity(10);
+    let mut numbers = HashSet::with_capacity(25);
     for line in cards.split(|&b| b == b'\n') {
-        let (_, numbers) = line.split_once(|&b| b == b':').unwrap();
-        let (winners, numbers) = numbers.split_once(|&b| b == b'|').unwrap();
-        let winners: HashSet<&[u8]> = winners
-            .trim_ascii()
+        let (_, rhs) = line.split_once(|&b| b == b':').unwrap();
+        let (lhs, rhs) = rhs.split_once(|&b| b == b'|').unwrap();
+        lhs.trim_ascii()
             .split(|&b| b == b' ')
             .filter(|s| s != b"") // Some numbers are separated by two spaces.
-            .collect();
+            .collect_into(&mut winners);
 
-        let numbers: HashSet<&[u8]> = numbers
-            .trim_ascii()
+        rhs.trim_ascii()
             .split(|&b| b == b' ')
             .filter(|s| s != b"")
-            .collect();
+            .collect_into(&mut numbers);
 
         let overlap = winners.intersection(&numbers).count();
         matches.push(overlap);
+
+        winners.clear();
+        numbers.clear();
     }
 
     matches
