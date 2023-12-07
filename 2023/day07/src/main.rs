@@ -9,13 +9,14 @@ fn main() {
 }
 
 fn part_1(input: &[u8]) -> usize {
-    let mut five = Vec::new();
-    let mut four = Vec::new();
-    let mut fullhouse = Vec::new();
-    let mut three = Vec::new();
-    let mut two_pair = Vec::new();
-    let mut one_pair = Vec::new();
-    let mut high_card = Vec::new();
+    let five = Vec::new();
+    let four = Vec::new();
+    let fullhouse = Vec::new();
+    let three = Vec::new();
+    let two_pair = Vec::new();
+    let one_pair = Vec::new();
+    let high_card = Vec::new();
+    let mut hands = [high_card, one_pair, two_pair, three, fullhouse, four, five];
 
     for line in input.split(|&b| b == b'\n') {
         let (hand, bid) = line.split_once(|&b| b == b' ').unwrap();
@@ -52,133 +53,84 @@ fn part_1(input: &[u8]) -> usize {
             }
         }
 
-        counts.sort_unstable();
-        match counts[8..13] {
-            [0, 0, 0, 0, 5] => five.push((hand_values, bid)),
-            [0, 0, 0, 1, 4] => four.push((hand_values, bid)),
-            [0, 0, 0, 2, 3] => fullhouse.push((hand_values, bid)),
-            [0, 0, 1, 1, 3] => three.push((hand_values, bid)),
-            [0, 0, 1, 2, 2] => two_pair.push((hand_values, bid)),
-            [0, 1, 1, 1, 2] => one_pair.push((hand_values, bid)),
-            [1, 1, 1, 1, 1] => high_card.push((hand_values, bid)),
-            _ => unreachable!(),
-        }
+        add_hands(counts, hand_values, bid, 0, &mut hands);
     }
 
-    let mut hands = [high_card, one_pair, two_pair, three, fullhouse, four, five];
-
-    for hand in hands.iter_mut() {
-        hand.sort_unstable_by(|(a, _), (b, _)| {
-            for (a, b) in a.iter().zip(b.iter()) {
-                let cmp = a.cmp(b);
-                if cmp != Ordering::Equal {
-                    return cmp;
-                }
-            }
-            Ordering::Equal
-        });
-    }
-
-    hands
-        .iter()
-        .flatten()
-        .enumerate()
-        .map(|(i, (_, bid))| bid * (i + 1))
-        .sum()
+    rank_and_sum_hands(&mut hands)
 }
 
 fn part_2(input: &[u8]) -> usize {
-    let mut five = Vec::new();
-    let mut four = Vec::new();
-    let mut fullhouse = Vec::new();
-    let mut three = Vec::new();
-    let mut two_pair = Vec::new();
-    let mut one_pair = Vec::new();
-    let mut high_card = Vec::new();
+    let five = Vec::new();
+    let four = Vec::new();
+    let fullhouse = Vec::new();
+    let three = Vec::new();
+    let two_pair = Vec::new();
+    let one_pair = Vec::new();
+    let high_card = Vec::new();
+    let mut hands = [high_card, one_pair, two_pair, three, fullhouse, four, five];
 
     for line in input.split(|&b| b == b'\n') {
         let (hand, bid) = line.split_once(|&b| b == b' ').unwrap();
         let bid: usize = atoi(bid).unwrap();
-        let mut counts: [(u8, u8); 13] = [
-            (0, b'2'),
-            (0, b'3'),
-            (0, b'4'),
-            (0, b'5'),
-            (0, b'6'),
-            (0, b'7'),
-            (0, b'8'),
-            (0, b'9'),
-            (0, b'T'),
-            (0, b'J'),
-            (0, b'Q'),
-            (0, b'K'),
-            (0, b'A'),
-        ];
+        let mut counts = [0u8; 13];
+        let mut jokers = 0u8;
         let mut hand_values = [0u8; 5];
         for (i, byte) in hand.iter().enumerate() {
             match byte {
                 num @ b'2'..=b'9' => {
-                    counts[(num - b'2') as usize].0 += 1;
+                    counts[(num - b'2') as usize] += 1;
                     hand_values[i] = num - b'0'
                 }
                 b'T' => {
-                    counts[8].0 += 1;
+                    counts[8] += 1;
                     hand_values[i] = 10;
                 }
                 b'J' => {
-                    counts[9].0 += 1;
+                    jokers += 1;
                     hand_values[i] = 0
                 }
                 b'Q' => {
-                    counts[10].0 += 1;
+                    counts[10] += 1;
                     hand_values[i] = 12;
                 }
                 b'K' => {
-                    counts[11].0 += 1;
+                    counts[11] += 1;
                     hand_values[i] = 13;
                 }
                 b'A' => {
-                    counts[12].0 += 1;
+                    counts[12] += 1;
                     hand_values[i] = 14
                 }
                 _ => unreachable!(),
             }
         }
-
-        counts.sort_unstable_by(|(a, _), (b, _)| a.cmp(b));
-        match counts[8..13] {
-            [_, _, _, _, (5, _)] => five.push((hand_values, bid)),
-            [_, _, _, (1, _), (4, b'J')] => five.push((hand_values, bid)),
-            [_, _, _, (1, b'J'), (4, _)] => five.push((hand_values, bid)),
-            [_, _, _, (1, _), (4, _)] => four.push((hand_values, bid)),
-            [_, _, _, (2, _), (3, b'J')] => five.push((hand_values, bid)),
-            [_, _, _, (2, b'J'), (3, _)] => five.push((hand_values, bid)),
-            [_, _, _, (2, _), (3, _)] => fullhouse.push((hand_values, bid)),
-            [_, _, (1, _), (1, _), (3, b'J')] => four.push((hand_values, bid)),
-            [_, _, (1, _), (1, b'J'), (3, _)] => four.push((hand_values, bid)),
-            [_, _, (1, b'J'), (1, _), (3, _)] => four.push((hand_values, bid)),
-            [_, _, (1, _), (1, _), (3, _)] => three.push((hand_values, bid)),
-            [_, _, (1, _), (2, _), (2, b'J')] => four.push((hand_values, bid)),
-            [_, _, (1, _), (2, b'J'), (2, _)] => four.push((hand_values, bid)),
-            [_, _, (1, b'J'), (2, _), (2, _)] => fullhouse.push((hand_values, bid)),
-            [_, _, (1, _), (2, _), (2, _)] => two_pair.push((hand_values, bid)),
-            [_, (1, _), (1, _), (1, _), (2, b'J')] => three.push((hand_values, bid)),
-            [_, (1, _), (1, _), (1, b'J'), (2, _)] => three.push((hand_values, bid)),
-            [_, (1, _), (1, b'J'), (1, _), (2, _)] => three.push((hand_values, bid)),
-            [_, (1, b'J'), (1, _), (1, _), (2, _)] => three.push((hand_values, bid)),
-            [_, (1, _), (1, _), (1, _), (2, _)] => one_pair.push((hand_values, bid)),
-            [(1, _), (1, _), (1, _), (1, _), (1, b'J')] => one_pair.push((hand_values, bid)),
-            [(1, _), (1, _), (1, _), (1, b'J'), (1, _)] => one_pair.push((hand_values, bid)),
-            [(1, _), (1, _), (1, b'J'), (1, _), (1, _)] => one_pair.push((hand_values, bid)),
-            [(1, _), (1, b'J'), (1, _), (1, _), (1, _)] => one_pair.push((hand_values, bid)),
-            [(1, b'J'), (1, _), (1, _), (1, _), (1, _)] => one_pair.push((hand_values, bid)),
-            [(1, _), (1, _), (1, _), (1, _), (1, _)] => high_card.push((hand_values, bid)),
-            _ => unreachable!(),
-        }
+        add_hands(counts, hand_values, bid, jokers, &mut hands);
     }
+    rank_and_sum_hands(&mut hands)
+}
 
-    let mut hands = [high_card, one_pair, two_pair, three, fullhouse, four, five];
+fn add_hands(
+    mut counts: [u8; 13],
+    hand_values: [u8; 5],
+    bid: usize,
+    jokers: u8,
+    hands: &mut [Vec<([u8; 5], usize)>],
+) {
+    counts.sort_unstable();
+    counts[12] += jokers;
+    match counts[8..13] {
+        [0, 0, 0, 0, 5] => hands[6].push((hand_values, bid)),
+        [0, 0, 0, 1, 4] => hands[5].push((hand_values, bid)),
+        [0, 0, 0, 2, 3] => hands[4].push((hand_values, bid)),
+        [0, 0, 1, 1, 3] => hands[3].push((hand_values, bid)),
+        [0, 0, 1, 2, 2] => hands[2].push((hand_values, bid)),
+        [0, 1, 1, 1, 2] => hands[1].push((hand_values, bid)),
+        [1, 1, 1, 1, 1] => hands[0].push((hand_values, bid)),
+        _ => unreachable!(),
+    }
+}
 
+fn rank_and_sum_hands(hands: &mut [Vec<([u8; 5], usize)>]) -> usize {
     for hand in hands.iter_mut() {
         hand.sort_unstable_by(|(a, _), (b, _)| {
             for (a, b) in a.iter().zip(b.iter()) {
@@ -198,6 +150,7 @@ fn part_2(input: &[u8]) -> usize {
         .map(|(i, (_, bid))| bid * (i + 1))
         .sum()
 }
+
 #[cfg(test)]
 mod test {
     use super::*;
