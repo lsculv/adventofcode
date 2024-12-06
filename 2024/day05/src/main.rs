@@ -1,6 +1,7 @@
 #![feature(array_chunks)]
 
 use std::{
+    cmp::Ordering,
     collections::{HashMap, LinkedList},
     fs::{self, File},
     io::{self, Read},
@@ -73,32 +74,24 @@ fn part2(input: &[u8]) -> u32 {
             let mut pages = line
                 .split(|&b| b == b',')
                 .map(|bytes| u16::from_le_bytes([bytes[0], bytes[1]]))
-                .collect::<Vec<u16>>();
+                .enumerate()
+                .collect::<Vec<(usize, u16)>>();
+
             let mut was_incorrect = false;
-            loop {
-                let mut no_error = true;
-
-                for i in 0..pages.len() {
-                    let page = pages[i];
-                    let Some(rules) = map.get(&page) else {
-                        continue;
-                    };
-                    for j in i..pages.len() {
-                        let p = pages[j];
-                        if rules.contains(&p) {
-                            no_error = false;
-                            was_incorrect = true;
-                            pages.swap(i, j);
-                        }
+            pages.sort_unstable_by(|(i, a), (j, b)| {
+                if let Some(rules) = map.get(b) {
+                    if rules.contains(a) && j < i {
+                        was_incorrect = true;
+                        Ordering::Less
+                    } else {
+                        Ordering::Greater
                     }
+                } else {
+                    Ordering::Equal
                 }
+            });
 
-                if no_error {
-                    break;
-                }
-            }
-
-            let middle = pages[pages.len() / 2];
+            let (_, middle) = pages[pages.len() / 2];
             was_incorrect as u32 * atoi::<u32>(&middle.to_le_bytes()).expect("Bytes are valid")
         })
         .sum()
