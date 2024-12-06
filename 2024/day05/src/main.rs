@@ -9,7 +9,7 @@ use std::{
 
 use atoi::atoi;
 
-type PageMap = HashMap<u16, LinkedList<u16>>;
+type PageMap = HashMap<u16, Vec<u16>>;
 
 fn part1(input: &[u8]) -> u32 {
     let updates_pos = input
@@ -24,8 +24,8 @@ fn part1(input: &[u8]) -> u32 {
         let value = u16::from_le_bytes([n1, n2]);
         let key = u16::from_le_bytes([n3, n4]);
         map.entry(key)
-            .and_modify(|list| list.push_back(value))
-            .or_insert(LinkedList::from([value]));
+            .and_modify(|vec| vec.push(value))
+            .or_insert(vec![value]);
     }
 
     input[updates_pos..]
@@ -64,8 +64,8 @@ fn part2(input: &[u8]) -> u32 {
         let value = u16::from_le_bytes([n1, n2]);
         let key = u16::from_le_bytes([n3, n4]);
         map.entry(key)
-            .and_modify(|list| list.push_back(value))
-            .or_insert(LinkedList::from([value]));
+            .and_modify(|vec| vec.push(value))
+            .or_insert(vec![value]);
     }
 
     input[updates_pos..]
@@ -84,7 +84,7 @@ fn part2(input: &[u8]) -> u32 {
                         was_incorrect = true;
                         Ordering::Less
                     } else {
-                        Ordering::Greater
+                        Ordering::Equal
                     }
                 } else {
                     Ordering::Equal
