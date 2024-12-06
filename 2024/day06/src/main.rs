@@ -3,6 +3,8 @@ use std::{
     io::{self, Read},
 };
 
+use rayon::prelude::*;
+
 type Grid<'a> = Vec<Vec<u8>>;
 
 fn parse_grid(input: &[u8]) -> Grid {
@@ -141,30 +143,31 @@ fn part1(input: &[u8]) -> usize {
     guard.travel(&mut grid).unwrap()
 }
 
-fn part2(input: &[u8]) -> u32 {
+fn part2(input: &[u8]) -> usize {
     let grid: Grid = parse_grid(input);
     let guard = Guard::from_grid(&grid);
 
     let mut test_grid = grid.clone();
     guard.clone().travel(&mut test_grid);
-    let positions = test_grid.iter().enumerate().flat_map(|(y, line)| {
-        line.iter()
-            .enumerate()
-            .filter_map(move |(x, &b)| if b == b'X' { Some((x, y)) } else { None })
-    });
+    let positions: Vec<_> = test_grid
+        .iter()
+        .enumerate()
+        .flat_map(|(y, line)| {
+            line.iter()
+                .enumerate()
+                .filter_map(move |(x, &b)| if b == b'X' { Some((x, y)) } else { None })
+        })
+        .collect();
 
-    let mut loops = 0;
-    for (x, y) in positions {
-        let mut guard_copy = guard.clone();
-        let mut grid_copy = grid.clone();
-        *index_grid_mut(&mut grid_copy, x, y).unwrap() = b'#';
-
-        if guard_copy.travel(&mut grid_copy).is_none() {
-            loops += 1;
-        }
-    }
-
-    loops
+    positions
+        .par_iter()
+        .filter(|(x, y)| {
+            let mut guard_copy = guard.clone();
+            let mut grid_copy = grid.clone();
+            *index_grid_mut(&mut grid_copy, *x, *y).unwrap() = b'#';
+            guard_copy.travel(&mut grid_copy).is_none()
+        })
+        .count()
 }
 
 fn main() -> io::Result<()> {
