@@ -143,24 +143,28 @@ fn part1(input: &[u8]) -> usize {
 
 fn part2(input: &[u8]) -> u32 {
     let grid: Grid = parse_grid(input);
-    let x_max = grid.first().unwrap().len();
-    let y_max = grid.len();
-
     let guard = Guard::from_grid(&grid);
-    let mut positions = 0;
-    for x in 0..x_max {
-        for y in 0..y_max {
-            let mut guard_copy = guard.clone();
-            let mut grid_copy = grid.clone();
-            *index_grid_mut(&mut grid_copy, x, y).unwrap() = b'#';
 
-            if guard_copy.travel(&mut grid_copy).is_none() {
-                positions += 1;
-            }
+    let mut test_grid = grid.clone();
+    guard.clone().travel(&mut test_grid);
+    let positions = test_grid.iter().enumerate().flat_map(|(y, line)| {
+        line.iter()
+            .enumerate()
+            .filter_map(move |(x, &b)| if b == b'X' { Some((x, y)) } else { None })
+    });
+
+    let mut loops = 0;
+    for (x, y) in positions {
+        let mut guard_copy = guard.clone();
+        let mut grid_copy = grid.clone();
+        *index_grid_mut(&mut grid_copy, x, y).unwrap() = b'#';
+
+        if guard_copy.travel(&mut grid_copy).is_none() {
+            loops += 1;
         }
     }
 
-    positions
+    loops
 }
 
 fn main() -> io::Result<()> {
