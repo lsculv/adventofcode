@@ -8,40 +8,13 @@ use std::{
 use atoi::atoi;
 use rayon::prelude::*;
 
-fn to_base3(mut n: usize) -> Vec<u8> {
-    if n == 0 {
-        return vec![b'0'; 64];
-    }
-
-    let mut base3 = Vec::new();
-
-    while n > 0 {
-        base3.push(b'0' + (n % 3) as u8);
-        n /= 3;
-    }
-
-    let pad_len = 64 - base3.len();
-    base3
-        .into_iter()
-        .chain((0..pad_len).map(|_| b'0'))
-        .collect()
-}
-
 trait Concat {
     fn concat(self, rhs: Self) -> Self;
 }
 
 impl Concat for u64 {
     fn concat(self, rhs: Self) -> Self {
-        let mut multiplier = 1;
-        let mut temp = rhs;
-
-        while temp > 0 {
-            multiplier *= 10;
-            temp /= 10;
-        }
-
-        self * multiplier + rhs
+        self * 10u64.pow(rhs.ilog10() + 1) + rhs
     }
 }
 
@@ -56,19 +29,15 @@ fn part1(input: &[u8]) -> u64 {
                 .map(|n| atoi(n).unwrap())
                 .collect();
             let possible_combinations: usize = 2usize.pow(values.len() as u32 - 1);
-            let is_possible = (0..possible_combinations).any(|comb| {
+            let is_possible = (0..possible_combinations).any(|mut comb| {
                 values
                     .iter()
                     .copied()
-                    .enumerate()
-                    .reduce(|(_, acc), (i, n)| {
-                        if ((comb >> (i - 1)) & 1) == 0 {
-                            (0, acc + n)
-                        } else {
-                            (0, acc * n)
-                        }
+                    .reduce(|acc, n| {
+                        let ret = if comb % 2 == 0 { acc + n } else { acc * n };
+                        comb /= 2;
+                        ret
                     })
-                    .map(|(_, e)| e)
                     .unwrap()
                     == target
             });
@@ -92,23 +61,24 @@ fn part2(input: &[u8]) -> u64 {
                 .map(|n| atoi(n).unwrap())
                 .collect();
             let possible_combinations: usize = 3usize.pow(values.len() as u32 - 1);
-            let is_possible = (0..possible_combinations)
-                .map(|comb| to_base3(comb))
-                .any(|comb| {
-                    values
-                        .iter()
-                        .copied()
-                        .enumerate()
-                        .reduce(|(_, acc), (i, n)| match comb.get(i - 1) {
-                            Some(b'0') => (0, acc + n),
-                            Some(b'1') => (0, acc * n),
-                            Some(b'2') => (0, acc.concat(n)),
-                            e => unreachable!("{e:?}"),
-                        })
-                        .map(|(_, e)| e)
-                        .unwrap()
-                        == target
-                });
+            let is_possible = (0..possible_combinations).any(|mut comb| {
+                values
+                    .iter()
+                    .copied()
+                    .reduce(|acc, n| {
+                        let ret = if comb % 3 == 0 {
+                            acc + n
+                        } else if comb % 3 == 1 {
+                            acc * n
+                        } else {
+                            acc.concat(n)
+                        };
+                        comb /= 3;
+                        ret
+                    })
+                    .unwrap()
+                    == target
+            });
             if is_possible {
                 Some(target)
             } else {
