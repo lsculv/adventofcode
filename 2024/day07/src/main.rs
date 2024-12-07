@@ -1,4 +1,5 @@
 #![feature(slice_split_once)]
+#![feature(iterator_try_reduce)]
 
 use std::{
     fs::{self, File},
@@ -30,16 +31,20 @@ fn part1(input: &[u8]) -> u64 {
                 .collect();
             let possible_combinations: usize = 2usize.pow(values.len() as u32 - 1);
             let is_possible = (0..possible_combinations).any(|mut comb| {
-                values
-                    .iter()
-                    .copied()
-                    .reduce(|acc, n| {
-                        let ret = if comb % 2 == 0 { acc + n } else { acc * n };
+                let result = values.iter().copied().try_reduce(|acc, n| {
+                    let ret = if comb % 2 == 0 { acc + n } else { acc * n };
+                    if ret > target {
+                        None
+                    } else {
                         comb /= 2;
-                        ret
-                    })
-                    .unwrap()
-                    == target
+                        Some(ret)
+                    }
+                });
+                match result {
+                    None => false,
+                    Some(Some(x)) => x == target,
+                    _ => unreachable!(),
+                }
             });
             if is_possible {
                 Some(target)
@@ -62,22 +67,26 @@ fn part2(input: &[u8]) -> u64 {
                 .collect();
             let possible_combinations: usize = 3usize.pow(values.len() as u32 - 1);
             let is_possible = (0..possible_combinations).any(|mut comb| {
-                values
-                    .iter()
-                    .copied()
-                    .reduce(|acc, n| {
-                        let ret = if comb % 3 == 0 {
-                            acc + n
-                        } else if comb % 3 == 1 {
-                            acc * n
-                        } else {
-                            acc.concat(n)
-                        };
+                let result = values.iter().copied().try_reduce(|acc, n| {
+                    let ret = if comb % 3 == 0 {
+                        acc + n
+                    } else if comb % 3 == 1 {
+                        acc * n
+                    } else {
+                        acc.concat(n)
+                    };
+                    if ret > target {
+                        None
+                    } else {
                         comb /= 3;
-                        ret
-                    })
-                    .unwrap()
-                    == target
+                        Some(ret)
+                    }
+                });
+                match result {
+                    None => false,
+                    Some(Some(x)) => x == target,
+                    _ => unreachable!(),
+                }
             });
             if is_possible {
                 Some(target)
