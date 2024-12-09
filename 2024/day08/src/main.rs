@@ -64,21 +64,6 @@ fn part1(input: &[u8]) -> u64 {
     antinodes.sort_unstable();
     antinodes.dedup();
 
-    // let a: String = input.iter().map(|&b| b as char).collect();
-    // println!("{a}");
-    // println!();
-    // for (y, row) in input.split(|&b| b == b'\n').enumerate() {
-    //     for (x, b) in row.iter().enumerate() {
-    //         if antinodes.contains(&(x as isize, y as isize)) {
-    //             print!("#");
-    //         } else {
-    //             print!("{}", *b as char);
-    //         }
-    //     }
-    //     println!();
-    // }
-    // println!();
-
     antinodes.len() as u64
 }
 
